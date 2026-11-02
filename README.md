@@ -77,23 +77,19 @@ Users should confirm that Udemy displays a zero price before enrolling.
 This project is intended for educational and automation purposes.
 ## 👨‍💻 Author: Mayordeleke
 Interested in Python, Software Development, Automation, and Web3.
-
-
 ## 📦 Installation
 
-Clone the repository:
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/mayordeleke/udemy-course-telegram-bot.git
-Navigate into the project:
 cd udemy-course-telegram-bot
-**Install dependencies:**
 pip install -r requirements.txt
-🔐 Environment Variables
+### 2. 🔐 Environment Variables
 The following environment variables are required:
 TELEGRAM_BOT_TOKEN
 TELEGRAM_CHAT_ID
-▶️ Running the Bot
+### 3. ▶️ Running the Bot
 After configuring the environment variables, run:
 python main.py
 
