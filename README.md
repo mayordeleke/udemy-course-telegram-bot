@@ -45,20 +45,27 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/mayordeleke/udemy-course-telegram-bot.git
+Navigate into the project:
 cd udemy-course-telegram-bot
+Install dependencies:
 pip install -r requirements.txt
+🔐 Environment Variables
+The following environment variables are required:
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
+▶️ Running the Bot
+After configuring the environment variables, run:
 python main.py
 
-## 📊 Project Results
+ 📊 Project Results
 During testing:
 24 courses discovered.
 23 new courses successfully published.
 0 failed publications.
 Duplicate prevention successfully tested.
-## ⚠️ Disclaimer
+⚠️ Disclaimer
 Course availability and coupon validity may change.
 Users should confirm that Udemy displays a zero price before enrolling.
 This project is intended for educational and automation purposes.
-## 👨‍💻 Author
-Mayordeleke
+ 👨‍💻 Author: Mayordeleke
 Interested in Python, Software Development, Automation, and Web3.
