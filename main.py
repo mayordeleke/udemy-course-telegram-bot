@@ -14,7 +14,10 @@ from urllib.parse import urljoin
 # ==========================================
 
 BASE_URL = "https://www.coursesoup.com/"
-HISTORY_FILE = "coursesoup_posted.json"
+HISTORY_FILE = os.getenv(
+    "HISTORY_FILE",
+    "coursesoup_posted.json"
+)
 DELAY_SECONDS = 2
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
