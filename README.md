@@ -83,13 +83,15 @@ Interested in Python, Software Development, Automation, and Web3.
 
 ```bash
 git clone https://github.com/mayordeleke/udemy-course-telegram-bot.git
+2. Navigate into the project
 cd udemy-course-telegram-bot
+3. Install dependencies
 pip install -r requirements.txt
-### 2. 🔐 Environment Variables
+ 🔐 Environment Variables
 The following environment variables are required:
 TELEGRAM_BOT_TOKEN
 TELEGRAM_CHAT_ID
-### 3. ▶️ Running the Bot
+ ▶️ Running the Bot
 After configuring the environment variables, run:
 python main.py
 
