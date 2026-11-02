@@ -63,6 +63,19 @@ During testing:
 23 new courses successfully published.
 0 failed publications.
 Duplicate prevention successfully tested.
+## 📸 Project Demonstration
+
+### Telegram Channel Publications
+
+The bot automatically publishes eligible free Udemy course offers to Telegram.
+
+![Telegram Publications](screenshots/telegram-publications.png)
+
+### Bot Testing Results
+
+The bot successfully published six new courses and passed the duplicate-prevention test.
+
+![Bot Test Results](screenshots/bot-test-results.png)
 ⚠️ Disclaimer
 Course availability and coupon validity may change.
 Users should confirm that Udemy displays a zero price before enrolling.
