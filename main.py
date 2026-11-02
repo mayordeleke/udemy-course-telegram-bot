@@ -293,4 +293,63 @@ def update_bot():
 
     print("Courses discovered:", len(courses))
 
-    print("Previously published
+    print("Previously published:", len(posted_courses))
+
+    published = 0
+    skipped = 0
+    failed = 0
+
+    for course_url in courses:
+
+        if course_url in posted_courses:
+            continue
+
+        try:
+
+            course = extract_course_details(course_url)
+
+            if not course:
+
+                print("Skipped (offer not eligible):", course_url)
+
+                skipped += 1
+
+                continue
+
+            publish_course(course)
+
+            posted_courses.add(course_url)
+
+            save_posted_courses(posted_courses)
+
+            published += 1
+
+            print("Published:", course["title"])
+
+            time.sleep(DELAY_SECONDS)
+
+        except Exception as error:
+
+            print("Error:", course_url)
+
+            print(error)
+
+            failed += 1
+
+    print("\n========== UPDATE COMPLETE ==========")
+
+    print("Published:", published)
+
+    print("Skipped:", skipped)
+
+    print("Failed:", failed)
+
+    print("Total recorded:", len(posted_courses))
+
+
+# ==========================================
+# START BOT
+# ==========================================
+
+if __name__ == "__main__":
+    update_bot()
