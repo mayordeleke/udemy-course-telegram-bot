@@ -21,8 +21,18 @@ POSTED_FILE = "posted_courses.json"
 
 session = requests.Session()
 
+session = requests.Session()
+
 session.headers.update({
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://courson.xyz/coupons",
+    "Origin": "https://courson.xyz"
 })
 
 
@@ -55,9 +65,19 @@ def save_posted_courses(posted_courses):
 # ==========================================
 # COLLECT COUPONS FROM COURSON
 # ==========================================
-
 def get_latest_coupons(offset=0):
 
+    # Visit the coupons page first.
+    page = session.get(
+        f"{BASE_URL}/coupons",
+        timeout=30
+    )
+
+    print("Coupons page status:", page.status_code)
+
+    page.raise_for_status()
+
+    # Request coupon data.
     response = session.post(
         f"{BASE_URL}/load-more-coupons",
         json={
@@ -67,14 +87,16 @@ def get_latest_coupons(offset=0):
         timeout=30
     )
 
+    print("Coupon API status:", response.status_code)
+
+    if response.status_code != 200:
+        print("Server response:", response.text[:500])
+
     response.raise_for_status()
 
     data = response.json()
 
-    return (
-        data.get("coupons", []),
-        data.get("total_count", 0)
-    )
+    return data.get("coupons", []), data.get("total_count", 0)
 
 
 # ==========================================
