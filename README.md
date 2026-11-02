@@ -87,7 +87,7 @@ Clone the repository:
 git clone https://github.com/mayordeleke/udemy-course-telegram-bot.git
 Navigate into the project:
 cd udemy-course-telegram-bot
-Install dependencies:
+**Install dependencies:**
 pip install -r requirements.txt
 🔐 Environment Variables
 The following environment variables are required:
