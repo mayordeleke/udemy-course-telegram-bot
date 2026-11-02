@@ -38,12 +38,26 @@ This project automates the process by collecting course offers, extracting relev
 5. Checks posting history to prevent duplicates.
 6. Publishes eligible offers to Telegram.
 7. Saves successfully published courses.
+## 🏗️ System Architecture
+
+Course Soup → Python Bot → Eligibility Checks → Telegram Channel
+
+The bot uses:
+
+- Course Soup as its course discovery source.
+- Python and BeautifulSoup for web scraping.
+- Telegram Bot API for publishing.
+- Google Drive and JSON for persistent posting history.
+- Google Colab for manual execution.
+- GitHub for source code management.
  ## 📊 Project Results
 During testing:
-24 courses discovered.
-23 new courses successfully published.
-0 failed publications.
-Duplicate prevention successfully tested.
+- 24 courses discovered in the initial run.
+- 23 new courses successfully published initially.
+- 6 additional courses published in a subsequent run.
+- 30 courses successfully recorded in total.
+- 0 failed publications.
+- Duplicate prevention successfully tested.
 ## 📸 Project Demonstration
 
 ### Telegram Channel Publications
