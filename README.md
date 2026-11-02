@@ -1,47 +1,64 @@
-# # Courson Udemy Coupon Bot 🤖
+# 🎓 Udemy Free Course Discovery & Telegram Bot
 
-An automated Python bot that collects free Udemy course coupon offers from Courson.xyz and publishes them to a Telegram channel.
+An automated Python bot that discovers free Udemy course offers from Course Soup, extracts coupon information, and publishes eligible courses to a Telegram channel.
 
-## 🚀 Features
+## 🚀 Project Overview
 
-- Collects the latest coupon offers from Courson.xyz.
-- Extracts Udemy course links and coupon codes.
-- Filters available coupon offers.
-- Publishes courses automatically to Telegram.
-- Prevents duplicate posts.
-- Runs automatically using GitHub Actions.
+Finding free Udemy courses manually can be time-consuming.
 
-## 🛠️ Technologies
+This project automates the process by collecting course offers, extracting relevant information, checking coupon availability indicators, and publishing the results to Telegram.
+
+## ✨ Features
+
+- Automatically discovers Udemy course offers.
+- Extracts course titles and descriptions.
+- Retrieves coupon codes.
+- Checks coupon activity indicators.
+- Filters offers that do not meet publishing criteria.
+- Publishes course information to Telegram.
+- Prevents duplicate publications.
+- Maintains posting history using JSON.
+- Adds a delay between Telegram messages.
+
+## 🛠️ Technologies Used
 
 - Python
 - Requests
 - BeautifulSoup
 - Telegram Bot API
-- GitHub Actions
+- JSON
+- Web Scraping
 
 ## ⚙️ How It Works
 
-1. Fetches coupon offers from Courson.xyz.
-2. Filters active coupons with remaining uses.
-3. Extracts course information and Udemy links.
-4. Checks whether a course has already been published.
-5. Sends new offers to the configured Telegram channel.
+1. Connects to Course Soup.
+2. Discovers available course pages.
+3. Extracts course information and coupon codes.
+4. Checks whether offers meet the publishing criteria.
+5. Checks posting history to prevent duplicates.
+6. Publishes eligible offers to Telegram.
+7. Saves successfully published courses.
 
-## 🔐 Environment Variables
+## 📦 Installation
 
-The following GitHub Secrets are required:
+Clone the repository:
 
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
+```bash
+git clone https://github.com/mayordeleke/udemy-course-telegram-bot.git
+cd udemy-course-telegram-bot
+pip install -r requirements.txt
+python main.py
 
-Never expose your bot token publicly.
-
-## ⏰ Automation
-
-GitHub Actions runs the bot automatically every six hours.
-
+## 📊 Project Results
+During testing:
+24 courses discovered.
+23 new courses successfully published.
+0 failed publications.
+Duplicate prevention successfully tested.
 ## ⚠️ Disclaimer
-
-Coupon availability may change. A coupon marked as active may expire or become unavailable before redemption.
-
-This project is intended for educational purposes.
+Course availability and coupon validity may change.
+Users should confirm that Udemy displays a zero price before enrolling.
+This project is intended for educational and automation purposes.
+## 👨‍💻 Author
+Mayordeleke
+Interested in Python, Software Development, Automation, and Web3.
