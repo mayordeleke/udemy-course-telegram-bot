@@ -38,6 +38,32 @@ This project automates the process by collecting course offers, extracting relev
 5. Checks posting history to prevent duplicates.
 6. Publishes eligible offers to Telegram.
 7. Saves successfully published courses.
+ ## 📊 Project Results
+During testing:
+24 courses discovered.
+23 new courses successfully published.
+0 failed publications.
+Duplicate prevention successfully tested.
+## 📸 Project Demonstration
+
+### Telegram Channel Publications
+
+The bot automatically publishes eligible free Udemy course offers to Telegram.
+
+![Telegram Publications](screenshots/telegram-publications.png)
+
+### Bot Testing Results
+
+The bot successfully published six new courses and passed the duplicate-prevention test.
+
+![Bot Test Results](screenshots/bot-test-results.png)
+## ⚠️ Disclaimer
+Course availability and coupon validity may change.
+Users should confirm that Udemy displays a zero price before enrolling.
+This project is intended for educational and automation purposes.
+## 👨‍💻 Author: Mayordeleke
+Interested in Python, Software Development, Automation, and Web3.
+
 
 ## 📦 Installation
 
@@ -57,28 +83,3 @@ TELEGRAM_CHAT_ID
 After configuring the environment variables, run:
 python main.py
 
- 📊 Project Results
-During testing:
-24 courses discovered.
-23 new courses successfully published.
-0 failed publications.
-Duplicate prevention successfully tested.
-## 📸 Project Demonstration
-
-### Telegram Channel Publications
-
-The bot automatically publishes eligible free Udemy course offers to Telegram.
-
-![Telegram Publications](screenshots/telegram-publications.png)
-
-### Bot Testing Results
-
-The bot successfully published six new courses and passed the duplicate-prevention test.
-
-![Bot Test Results](screenshots/bot-test-results.png)
-⚠️ Disclaimer
-Course availability and coupon validity may change.
-Users should confirm that Udemy displays a zero price before enrolling.
-This project is intended for educational and automation purposes.
- 👨‍💻 Author: Mayordeleke
-Interested in Python, Software Development, Automation, and Web3.
