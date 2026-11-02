@@ -189,8 +189,13 @@ def main():
 
     for coupon in all_coupons:
 
-        if coupon.get("status_label") != "Live":
-            continue
+    if coupon.get("status_label") != "Live":
+        continue
+
+    course_id = f"{BASE_URL}/claim/{coupon.get('id_name')}"
+
+    if course_id in posted_courses:
+        continue
 
         if int(coupon.get("coupon_uses_remaining") or 0) <= 0:
             continue
