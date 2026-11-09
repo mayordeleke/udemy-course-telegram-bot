@@ -14,10 +14,12 @@ from urllib.parse import urljoin
 # ==========================================
 
 BASE_URL = "https://www.coursesoup.com/"
+
 HISTORY_FILE = os.getenv(
     "HISTORY_FILE",
     "coursesoup_posted.json"
 )
+
 DELAY_SECONDS = 2
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -79,9 +81,36 @@ def discover_courses():
         if "/course/" in href:
 
             course_url = urljoin(BASE_URL, href)
+
             course_urls[course_url] = True
 
     return list(course_urls.keys())
+
+
+# ==========================================
+# CHECK COUPON EXPIRY
+# ==========================================
+
+def is_coupon_valid(expiry):
+
+    if not expiry:
+        return False
+
+    expiry_match = re.search(
+        r"(\d+)\s+(days?|hours?|minutes?)",
+        expiry,
+        re.IGNORECASE
+    )
+
+    if not expiry_match:
+        return False
+
+    remaining_time = int(expiry_match.group(1))
+
+    if remaining_time <= 0:
+        return False
+
+    return True
 
 
 # ==========================================
@@ -114,13 +143,13 @@ def extract_course_details(course_url):
         if description_tag else ""
     )
 
-    # Verify discount and coupon status
+    # Check discount and coupon status
 
     is_discounted = "100% OFF" in page_text
 
     is_active = (
-        "This coupon is live" in page_text
-        and "Coupon active" in page_text
+        "Coupon active" in page_text
+        or "This coupon is live" in page_text
     )
 
     is_free = re.search(
@@ -143,6 +172,9 @@ def extract_course_details(course_url):
         and is_free
         and coupon_match
     ):
+
+        print("Skipping ineligible course:", title)
+
         return None
 
     coupon_code = coupon_match.group(1)
@@ -155,10 +187,19 @@ def extract_course_details(course_url):
         re.IGNORECASE
     )
 
-    redemptions = (
-        redemption_match.group(1)
-        if redemption_match else "Not specified"
-    )
+    if not redemption_match:
+
+        print("Skipping: redemption information unavailable:", title)
+
+        return None
+
+    redemptions = int(redemption_match.group(1))
+
+    if redemptions <= 0:
+
+        print("Skipping exhausted coupon:", title)
+
+        return None
 
     # Extract expiry
 
@@ -170,8 +211,16 @@ def extract_course_details(course_url):
 
     expiry = (
         expiry_match.group(1).strip()
-        if expiry_match else "Check course page"
+        if expiry_match else None
     )
+
+    # Reject expired or unverifiable coupons
+
+    if not is_coupon_valid(expiry):
+
+        print("Skipping expired or unverifiable coupon:", title)
+
+        return None
 
     # Extract last verification time
 
@@ -186,11 +235,13 @@ def extract_course_details(course_url):
         if verified_match else "Not specified"
     )
 
+    print("Valid coupon found:", title)
+
     return {
         "title": title,
         "description": description,
         "coupon": coupon_code,
-        "redemptions": redemptions,
+        "redemptions": str(redemptions),
         "expiry": expiry,
         "verified": verified,
         "link": course_url
@@ -266,6 +317,7 @@ def publish_course(course):
         result = response.json()
 
     except ValueError:
+
         raise RuntimeError(
             f"Unexpected Telegram response: HTTP {response.status_code}"
         )
@@ -355,4 +407,5 @@ def update_bot():
 # ==========================================
 
 if __name__ == "__main__":
+
     update_bot()
