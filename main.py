@@ -267,10 +267,10 @@ def extract_course_details(course_url):
         if verified_match else "Not specified"
     )
     if not is_coupon_valid(expiry, verified):
-    print("Skipping expired or unverifiable coupon:", title)
+       print("Skipping expired or unverifiable coupon:", title)
     return None
 
-    print("Valid coupon found:", title)
+           print("Valid coupon found:", title)
 
     return {
         "title": title,
