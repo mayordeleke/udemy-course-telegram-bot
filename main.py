@@ -7,6 +7,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from datetime import datetime, timedelta
 
 
 # ==========================================
@@ -91,13 +92,14 @@ def discover_courses():
 # CHECK COUPON EXPIRY
 # ==========================================
 
-def is_coupon_valid(expiry):
+def is_coupon_valid(expiry, verified):
 
-    if not expiry:
+    if not expiry or not verified:
         return False
 
+    # Extract expiry duration
     expiry_match = re.search(
-        r"(\d+)\s+(days?|hours?|minutes?)",
+        r"(\d+)\s*(days?|hours?|minutes?)",
         expiry,
         re.IGNORECASE
     )
@@ -105,12 +107,42 @@ def is_coupon_valid(expiry):
     if not expiry_match:
         return False
 
-    remaining_time = int(expiry_match.group(1))
+    expiry_value = int(expiry_match.group(1))
+    expiry_unit = expiry_match.group(2).lower()
 
-    if remaining_time <= 0:
+    # Convert expiry into minutes
+    if "day" in expiry_unit:
+        expiry_minutes = expiry_value * 1440
+    elif "hour" in expiry_unit:
+        expiry_minutes = expiry_value * 60
+    else:
+        expiry_minutes = expiry_value
+
+    # Extract time since last verification
+    verified_match = re.search(
+        r"(\d+)\s*(days?|hours?|minutes?|d|h|min|m)\s*ago",
+        verified,
+        re.IGNORECASE
+    )
+
+    if not verified_match:
         return False
 
-    return True
+    verified_value = int(verified_match.group(1))
+    verified_unit = verified_match.group(2).lower()
+
+    # Convert verification age into minutes
+    if verified_unit in ("day", "days", "d"):
+        verified_minutes = verified_value * 1440
+    elif verified_unit in ("hour", "hours", "h"):
+        verified_minutes = verified_value * 60
+    else:
+        verified_minutes = verified_value
+
+    # Calculate estimated remaining validity
+    remaining_minutes = expiry_minutes - verified_minutes
+
+    return remaining_minutes > 0
 
 
 # ==========================================
@@ -234,6 +266,9 @@ def extract_course_details(course_url):
         verified_match.group(1).strip()
         if verified_match else "Not specified"
     )
+    if not is_coupon_valid(expiry, verified):
+    print("Skipping expired or unverifiable coupon:", title)
+    return None
 
     print("Valid coupon found:", title)
 
