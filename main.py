@@ -7,7 +7,6 @@ import requests
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from datetime import datetime, timedelta
 
 
 # ==========================================
@@ -22,6 +21,7 @@ HISTORY_FILE = os.getenv(
 )
 
 DELAY_SECONDS = 2
+REQUEST_DELAY_SECONDS = 3
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
@@ -30,6 +30,11 @@ if not BOT_TOKEN or not CHAT_ID:
     raise RuntimeError(
         "Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID."
     )
+
+
+# ==========================================
+# HTTP SESSION
+# ==========================================
 
 session = requests.Session()
 
@@ -48,12 +53,14 @@ def load_posted_courses():
         return set()
 
     with open(HISTORY_FILE, "r", encoding="utf-8") as file:
+
         return set(json.load(file))
 
 
 def save_posted_courses(posted_courses):
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+
         json.dump(
             sorted(posted_courses),
             file,
@@ -68,10 +75,17 @@ def save_posted_courses(posted_courses):
 
 def discover_courses():
 
-    response = session.get(BASE_URL, timeout=30)
+    response = session.get(
+        BASE_URL,
+        timeout=30
+    )
+
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(
+        response.text,
+        "html.parser"
+    )
 
     course_urls = {}
 
@@ -98,6 +112,7 @@ def is_coupon_valid(expiry, verified):
         return False
 
     # Extract expiry duration
+
     expiry_match = re.search(
         r"(\d+)\s*(days?|hours?|minutes?)",
         expiry,
@@ -108,17 +123,25 @@ def is_coupon_valid(expiry, verified):
         return False
 
     expiry_value = int(expiry_match.group(1))
+
     expiry_unit = expiry_match.group(2).lower()
 
     # Convert expiry into minutes
+
     if "day" in expiry_unit:
+
         expiry_minutes = expiry_value * 1440
+
     elif "hour" in expiry_unit:
+
         expiry_minutes = expiry_value * 60
+
     else:
+
         expiry_minutes = expiry_value
 
-    # Extract time since last verification
+    # Extract verification age
+
     verified_match = re.search(
         r"(\d+)\s*(days?|hours?|minutes?|d|h|min|m)\s*ago",
         verified,
@@ -129,17 +152,25 @@ def is_coupon_valid(expiry, verified):
         return False
 
     verified_value = int(verified_match.group(1))
+
     verified_unit = verified_match.group(2).lower()
 
     # Convert verification age into minutes
+
     if verified_unit in ("day", "days", "d"):
+
         verified_minutes = verified_value * 1440
+
     elif verified_unit in ("hour", "hours", "h"):
+
         verified_minutes = verified_value * 60
+
     else:
+
         verified_minutes = verified_value
 
     # Calculate estimated remaining validity
+
     remaining_minutes = expiry_minutes - verified_minutes
 
     return remaining_minutes > 0
@@ -151,12 +182,21 @@ def is_coupon_valid(expiry, verified):
 
 def extract_course_details(course_url):
 
-    response = session.get(course_url, timeout=30)
+    response = session.get(
+        course_url,
+        timeout=30
+    )
+
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(
+        response.text,
+        "html.parser"
+    )
 
     page_text = soup.get_text(" ", strip=True)
+
+    # Extract course title
 
     heading = soup.find("h1")
 
@@ -164,6 +204,8 @@ def extract_course_details(course_url):
         return None
 
     title = heading.get_text(" ", strip=True)
+
+    # Extract description
 
     description_tag = soup.find(
         "meta",
@@ -175,7 +217,9 @@ def extract_course_details(course_url):
         if description_tag else ""
     )
 
-    # Check discount and coupon status
+    # ======================================
+    # CHECK COUPON STATUS
+    # ======================================
 
     is_discounted = "100% OFF" in page_text
 
@@ -211,7 +255,9 @@ def extract_course_details(course_url):
 
     coupon_code = coupon_match.group(1)
 
-    # Extract remaining redemptions
+    # ======================================
+    # CHECK REMAINING REDEMPTIONS
+    # ======================================
 
     redemption_match = re.search(
         r"Redemptions left\s*[≈~]?\s*(\d+)",
@@ -221,7 +267,10 @@ def extract_course_details(course_url):
 
     if not redemption_match:
 
-        print("Skipping: redemption information unavailable:", title)
+        print(
+            "Skipping: redemption information unavailable:",
+            title
+        )
 
         return None
 
@@ -233,7 +282,9 @@ def extract_course_details(course_url):
 
         return None
 
-    # Extract expiry
+    # ======================================
+    # EXTRACT EXPIRY
+    # ======================================
 
     expiry_match = re.search(
         r"Expires in\s+(.+?)\s+Last verified",
@@ -246,31 +297,39 @@ def extract_course_details(course_url):
         if expiry_match else None
     )
 
-    # Reject expired or unverifiable coupons
-
-    if not is_coupon_valid(expiry):
-
-        print("Skipping expired or unverifiable coupon:", title)
-
-        return None
-
-    # Extract last verification time
+    # ======================================
+    # EXTRACT LAST VERIFICATION TIME
+    # ======================================
 
     verified_match = re.search(
-        r"Last verified\s+(.+?)(?:Get This Course Free|Affiliate link)",
+        r"Last verified\s+(\d+\s*(?:days?|hours?|minutes?|d|h|min|m)\s*ago)",
         page_text,
         re.IGNORECASE
     )
 
     verified = (
         verified_match.group(1).strip()
-        if verified_match else "Not specified"
+        if verified_match else None
     )
+
+    # ======================================
+    # VALIDATE COUPON
+    # ======================================
+
     if not is_coupon_valid(expiry, verified):
-        print("Skipping expired or unverifiable coupon:", title)
+
+        print(
+            "Skipping expired or unverifiable coupon:",
+            title
+        )
+
         return None
 
     print("Valid coupon found:", title)
+
+    # ======================================
+    # RETURN COURSE INFORMATION
+    # ======================================
 
     return {
         "title": title,
@@ -290,10 +349,15 @@ def extract_course_details(course_url):
 def format_message(course):
 
     title = html.escape(course["title"])
+
     description = html.escape(course["description"])
+
     coupon = html.escape(course["coupon"])
+
     redemptions = html.escape(course["redemptions"])
+
     expiry = html.escape(course["expiry"])
+
     verified = html.escape(course["verified"])
 
     link = html.escape(
@@ -349,6 +413,7 @@ def publish_course(course):
     )
 
     try:
+
         result = response.json()
 
     except ValueError:
@@ -386,27 +451,40 @@ def update_bot():
     print("Previously published:", len(posted_courses))
 
     published = 0
+
     skipped = 0
+
     failed = 0
 
     for course_url in courses:
+
+        # Prevent duplicate publications
 
         if course_url in posted_courses:
             continue
 
         try:
 
+            # Extract course information
+
             course = extract_course_details(course_url)
 
             if not course:
 
-                print("Skipped (offer not eligible):", course_url)
+                print(
+                    "Skipped (offer not eligible):",
+                    course_url
+                )
 
                 skipped += 1
 
                 continue
 
+            # Publish to Telegram
+
             publish_course(course)
+
+            # Save successfully published course
 
             posted_courses.add(course_url)
 
@@ -425,6 +503,16 @@ def update_bot():
             print(error)
 
             failed += 1
+
+        finally:
+
+            # Reduce rapid requests to Course Soup
+
+            time.sleep(REQUEST_DELAY_SECONDS)
+
+    # ======================================
+    # UPDATE SUMMARY
+    # ======================================
 
     print("\n========== UPDATE COMPLETE ==========")
 
